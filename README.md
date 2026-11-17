@@ -1,46 +1,49 @@
-🔐 SecureBase — Full-Stack Authentication & RBAC Starter
+<img width="1234" height="625" alt="image" src="https://github.com/user-attachments/assets/b6a60c48-3b27-42f7-a0f7-d0204e0858f9" />
+<img width="1195" height="493" alt="image" src="https://github.com/user-attachments/assets/6ce20f8a-e8ec-4382-94d0-2ea1068e96dd" />
 
-Sistema completo de autenticación, autorización basada en roles (RBAC) y gestión segura de sesiones, desarrollado con Spring Boot 4, Java 17, React 19 y Vite 8.
+🔐 SecureBase
+Full-Stack Authentication & Role-Based Access Control Starter
+Una solución full-stack de autenticación y autorización desarrollada con Spring Boot, Spring Security, React y MySQL, diseñada para implementar una gestión segura de usuarios, sesiones y permisos.
 
-SecureBase implementa un ciclo de autenticación completo con Access Tokens y Refresh Tokens, rotación automática de tokens, protección CSRF para aplicaciones SPA, verificación de cuentas por correo electrónico, recuperación de contraseñas y control de acceso basado en roles.
+SecureBase implementa un sistema de autenticación basado en Access Tokens y Refresh Tokens, rotación automática de sesiones, protección CSRF para aplicaciones SPA, verificación de cuentas por correo electrónico y recuperación segura de contraseñas.
 
-El objetivo del proyecto es ofrecer una base de autenticación reutilizable, con especial atención a la seguridad, la consistencia de datos y la gestión del ciclo de vida de las sesiones.
+El proyecto está diseñado como una base reutilizable para aplicaciones que requieren un sistema de autenticación robusto, con especial atención a la seguridad, la consistencia de datos y el control de acceso.
 
 ✨ Características principales
-🔑 Autenticación Dual-Token (Access + Refresh)
-Access Token (JWT): token de corta duración almacenado exclusivamente en memoria en el cliente, reduciendo su exposición ante ataques XSS.
-Refresh Token: almacenado en una cookie HttpOnly, inaccesible desde JavaScript.
+🔑 Autenticación y gestión de sesiones
+JWT Access Tokens: tokens de corta duración almacenados exclusivamente en memoria del cliente.
+Refresh Tokens: almacenados en cookies HttpOnly, inaccesibles desde JavaScript.
 Rotación automática: cada renovación genera un nuevo Refresh Token e invalida el anterior.
-Persistencia hasheada: los Refresh Tokens se almacenan en MySQL utilizando SHA-256.
-Revocación de sesiones: las sesiones activas se revocan automáticamente después de un restablecimiento de contraseña.
+Persistencia segura: los Refresh Tokens se almacenan hasheados mediante SHA-256 en MySQL.
+Revocación de sesiones: las sesiones activas se revocan después de un restablecimiento de contraseña.
 🛡️ Seguridad
 Spring Security con autenticación stateless.
 Protección CSRF para aplicaciones SPA mediante csrf.spa().
 Cookie XSRF-TOKEN y cabecera X-XSRF-TOKEN.
-Encriptación de contraseñas mediante BCrypt.
+Hashing de contraseñas mediante BCrypt.
 Manejadores personalizados de autenticación y acceso denegado.
 Configuración CORS.
-Validación de datos mediante Bean Validation.
-📧 Ciclo de vida de cuenta
+Validación de solicitudes mediante Bean Validation.
+📧 Gestión del ciclo de vida de cuentas
 Registro de usuarios.
 Verificación de correo electrónico mediante códigos OTP de 6 dígitos.
-Expiración de códigos OTP después de 15 minutos.
+Expiración de códigos después de 15 minutos.
 Límite de intentos de verificación.
-Cooldown de 60 segundos para reenvío de códigos.
+Cooldown de 60 segundos para reenviar códigos.
 Recuperación de contraseñas.
-Restablecimiento seguro de contraseñas.
-Revocación de sesiones activas después del restablecimiento.
+Restablecimiento seguro de credenciales.
+Revocación de sesiones activas después del cambio de contraseña.
 ⚙️ Concurrencia y consistencia
 Bloqueos pesimistas mediante PESSIMISTIC_WRITE en JPA.
 Prevención de condiciones de carrera durante la rotación de Refresh Tokens.
-Control de concurrencia durante la validación de códigos de verificación.
-👥 Control de acceso basado en roles (RBAC)
-ROLE_USER
-ROLE_ADMIN
+Control de concurrencia durante la validación de códigos OTP.
+👥 Control de acceso (RBAC)
+Roles ROLE_USER y ROLE_ADMIN.
 Inicialización automática de roles al iniciar la aplicación.
 Protección de endpoints según los permisos del usuario autenticado.
 🛠️ Stack tecnológico
 Backend
+
 Tecnología	Utilización
 Java 17	Lenguaje de programación
 Spring Boot 4.1.1	Framework backend
@@ -54,61 +57,71 @@ Lombok	Reducción de código repetitivo
 Bean Validation	Validación de solicitudes
 Maven Wrapper	Gestión de dependencias
 Frontend
+
 Tecnología	Utilización
 React 19	Biblioteca de interfaces
-Vite 8	Herramienta de desarrollo y compilación
+Vite 8	Desarrollo y compilación
 Axios	Cliente HTTP
 CSS3	Estilos y diseño responsivo
-🏗️ Arquitectura del flujo de autenticación
+🏗️ Arquitectura de autenticación
+SecureBase utiliza una estrategia de autenticación basada en dos tokens independientes, cada uno con una responsabilidad específica.
 
-SecureBase utiliza una estrategia de autenticación basada en dos tokens independientes.
+Flujo de autenticación
 
 text
-                  REACT CLIENT
-                       |
-                       |
-                GET /auth/csrf
-                       |
-                       v
-                Cookie XSRF-TOKEN
-                       |
-                       |
-                POST /auth/login
-                + X-XSRF-TOKEN
-                       |
-                       v
-                 SPRING SECURITY
-                       |
-                       v
-                Validación de credenciales
-                       |
-                +------+------+
-                |             |
-                v             v
-             Access JWT   Refresh Token
-             JSON         Cookie HttpOnly
-                |             |
-                v             v
-          Memoria del     Cookie del
-             cliente       navegador
-                |             |
-                v             v
-         Requests API    POST /auth/refresh
-                              |
-                              v
+                    REACT CLIENT
+                         |
+                         v
+                   GET /auth/csrf
+                         |
+                         v
+                   Cookie XSRF-TOKEN
+                         |
+                         v
+                   POST /auth/login
+                    + X-XSRF-TOKEN
+                         |
+                         v
+                  SPRING SECURITY
+                         |
+                         v
+              Validación de credenciales
+                         |
+                  +------+------+
+                  |             |
+                  v             v
+              Access JWT   Refresh Token
+                (JSON)     (HttpOnly Cookie)
+                  |             |
+                  v             v
+             Memoria del    Navegador
+               cliente          |
+                                v
+                       POST /auth/refresh
+                                |
+                                v
                        Validación del token
-                       Bloqueo en BD
-                       Rotación del token
-                              |
-                              v
+                                |
+                         Bloqueo en BD
+                                |
+                         Rotación del token
+                                |
+                                v
                        Nuevo par de tokens
-
 Estrategia de almacenamiento
-Token	Almacenamiento	Función
+
+Elemento	Almacenamiento	Responsabilidad
 Access Token	Memoria del cliente	Autorizar solicitudes protegidas
 Refresh Token	Cookie HttpOnly	Renovar sesiones
 Hash del Refresh Token	MySQL	Validar y revocar sesiones
+¿Por qué utilizar dos tokens?
+
+Esta estrategia permite mantener los Access Tokens fuera del almacenamiento persistente del navegador, mientras que los Refresh Tokens se gestionan mediante cookies HttpOnly.
+
+La rotación de Refresh Tokens permite renovar las sesiones e invalidar los tokens anteriores.
+
 📁 Estructura del proyecto
+
 text
 SecureBase/
 │
@@ -147,28 +160,29 @@ SecureBase/
 │   └── vite.config.js
 │
 └── README.md
-
 🚀 Instalación y ejecución local
 Requisitos previos
+Antes de comenzar, asegurate de tener instalado:
+
 JDK 17 o versión compatible con el proyecto.
 Node.js 20+.
 npm.
 MySQL 8+.
 1. Clonar el repositorio
+
 bash
 git clone https://github.com/Agustin771/SecureBase-Full-Stack-Authentication-RBAC-Starter.git
 
 cd SecureBase-Full-Stack-Authentication-RBAC-Starter
+2. Configurar la base de datos
+Crear la base de datos en MySQL:
 
-2. Configuración del Backend
-
-Crear una base de datos en MySQL:
 
 sql
 CREATE DATABASE secure_base_db;
+3. Configurar variables de entorno del backend
+Configurar las siguientes variables antes de iniciar Spring Boot:
 
-
-Configurar las siguientes variables de entorno antes de iniciar Spring Boot:
 
 Variable	Descripción
 URL_BD	URL de conexión a MySQL
@@ -178,9 +192,9 @@ JWT_SECRET_KEY	Secreto Base64 para firmar JWT
 JWT_EXPIRATION	Duración del Access Token en milisegundos
 EMAIL_USERNAME	Correo utilizado para SMTP
 EMAIL_PASSWORD	Contraseña de aplicación SMTP
-CORS_ALLOWED_ORIGINS	Origen permitido para el frontend
-
+CORS_ALLOWED_ORIGINS	Orígenes permitidos para el frontend
 Ejemplo de configuración para desarrollo local:
+
 
 properties
 URL_BD=jdbc:mysql://localhost:3306/secure_base_db
@@ -194,63 +208,58 @@ EMAIL_USERNAME=tu_correo@gmail.com
 EMAIL_PASSWORD=tu_app_password
 
 CORS_ALLOWED_ORIGINS=http://localhost:5173
-
-
 Generar un secreto JWT aleatorio y seguro de al menos 256 bits.
 
-Importante: nunca subir credenciales reales, contraseñas SMTP ni secretos JWT al repositorio.
+⚠️ Importante: nunca subir credenciales reales, contraseñas SMTP ni secretos JWT al repositorio.
+4. Iniciar el backend
+Desde la carpeta raíz del proyecto:
 
-Iniciar el backend desde la carpeta raíz:
+Windows (PowerShell):
 
-Windows:
 
 powershell
 cd backend
 .\mvnw.cmd spring-boot:run
-
-
 Linux / macOS:
+
 
 bash
 cd backend
 ./mvnw spring-boot:run
-
-
 El backend estará disponible en:
 
+
+text
 http://localhost:8080
-
-3. Configuración del Frontend
-
+5. Configurar el frontend
 Ingresar a la carpeta frontend:
+
 
 bash
 cd frontend
+Instalar las dependencias:
 
-
-Instalar dependencias:
 
 bash
 npm install
-
-
 Crear un archivo .env tomando como referencia .env.example:
+
 
 env
 VITE_API_URL=http://localhost:8080
-
-
 Iniciar el servidor de desarrollo:
+
 
 bash
 npm run dev
-
-
 El frontend estará disponible en:
 
-http://localhost:5173
 
+text
+http://localhost:5173
 📡 Endpoints principales
+Autenticación y gestión de cuentas
+
 Método	Endpoint	Acceso	Descripción
 GET	/auth/csrf	Público	Inicializa el token CSRF para la SPA
 POST	/auth/register	Público	Registra un nuevo usuario
@@ -263,32 +272,41 @@ POST	/auth/logout	Cookie-based	Revoca la sesión activa
 POST	/auth/forgot-password	Público	Inicia la recuperación de contraseña
 POST	/auth/reset-password	Público	Restablece la contraseña
 GET	/auth/me	Autenticado	Devuelve los datos del usuario actual
+Endpoints protegidos
+
+Método	Endpoint	Acceso	Descripción
 GET	/prueba	ROLE_ADMIN	Endpoint protegido para administradores
-
 Nota: los endpoints basados en cookies requieren una cookie Refresh Token válida y la cabecera CSRF correspondiente.
-
 🔒 Consideraciones de seguridad
-
-SecureBase incorpora diferentes mecanismos de protección:
+SecureBase incorpora diferentes mecanismos de protección para reducir los riesgos asociados a la autenticación y gestión de sesiones:
 
 Access Tokens de corta duración.
 Refresh Tokens almacenados en cookies HttpOnly.
-Rotación de Refresh Tokens.
+Rotación automática de Refresh Tokens.
 Persistencia hasheada de tokens.
 Protección CSRF para aplicaciones SPA.
 Hashing de contraseñas mediante BCrypt.
 Expiración y cooldown de códigos OTP.
+Límite de intentos de verificación.
 Revocación de sesiones después del restablecimiento de contraseñas.
 Bloqueos pesimistas para operaciones concurrentes sensibles.
+Recomendaciones para producción
+Antes de desplegar la aplicación en un entorno productivo, se recomienda:
 
-Para despliegues productivos se recomienda configurar HTTPS, cookies seguras, secretos independientes por entorno, políticas CORS restrictivas y permisos adecuados para la base de datos.
-
-El proyecto constituye una base de autenticación orientada a la seguridad y requiere una revisión específica antes de utilizarse en producción.
-
+Configurar HTTPS.
+Utilizar cookies seguras.
+Mantener secretos independientes por entorno.
+Aplicar políticas CORS restrictivas.
+Configurar permisos adecuados para la base de datos.
+Realizar una revisión de seguridad específica del despliegue.
+SecureBase constituye una base de autenticación orientada a la seguridad. Su utilización en producción requiere una revisión y configuración específicas para cada entorno.
 👨‍💻 Autor
-
 Agustín Pérez
 
 GitHub: @Agustin771
-
-Repositorio: SecureBase
+Repositorio: SecureBase — Full-Stack Authentication & RBAC Starter
+<p align="center">
+🔐 <strong>SecureBase</strong>
+<br/>
+<sub>A foundation for secure authentication and session management.</sub>
+</p>
